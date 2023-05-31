@@ -1,0 +1,4 @@
+name: restart
+version: '${project.version}'
+main: de.ender.restart.Restart
+api-version: 1.19
