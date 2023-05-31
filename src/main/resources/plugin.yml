@@ -1,4 +1,10 @@
-name: restart
+name: meins_restart
 version: '${project.version}'
-main: de.ender.restart.Restart
+main: de.ender.restart.Main
 api-version: 1.19
+author: ender__exe
+depend: [ meins_core ]
+
+commands:
+  restartServer:
+    permission: restart.command.restartServer
