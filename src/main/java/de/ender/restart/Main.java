@@ -1,7 +1,7 @@
 package de.ender.restart;
 
 import de.ender.core.Log;
-import org.bukkit.ChatColor;
+import de.ender.core.UpdateChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin {
@@ -9,8 +9,10 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        Log.log(ChatColor.GREEN + "Enabling Meins Restart...");
+        Log.enable(this);
         plugin = this;
+
+        new UpdateChecker(this,"master").check().downloadLatestMeins();
 
         RestartManager.init();
         getCommand("restartServer").setExecutor(new RestartCommand());
@@ -18,7 +20,7 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Log.log(ChatColor.GREEN + "Disabling Meins Restart...");
+        Log.disable(this);
     }
 
     public static Main getPlugin(){
