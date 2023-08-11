@@ -1,8 +1,10 @@
 package de.ender.restart;
 
 import de.ender.core.CConfig;
+import de.ender.core.Log;
 import de.ender.core.PluginMessageManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -36,7 +38,7 @@ public class RestartManager {
         String sTime = config.getString("time");
         long sHours = Long.parseLong(sTime.substring(0,sTime.indexOf(":")));
         long sMinutes = Long.parseLong(sTime.substring(sTime.indexOf(":")+1));
-        return TimeUnit.HOURS.toMillis(sHours)+TimeUnit.MILLISECONDS.toMillis(sMinutes);
+        return TimeUnit.HOURS.toMillis(sHours)+TimeUnit.MINUTES.toMillis(sMinutes);
     }
     public static long getTimeTilRestart(){
         CConfig cconfig = new CConfig("config",Main.getPlugin());
@@ -67,16 +69,22 @@ public class RestartManager {
             @Override
             public void run() {
                 Bukkit.broadcast(MiniMessage.miniMessage().deserialize("<gold>Server Restarting in 1 Minute!"));
-                try {
-                    wait(TimeUnit.SECONDS.toMillis(60));
-                    Bukkit.broadcast(MiniMessage.miniMessage().deserialize("<red>Restarting Server!"));
-                    wait(TimeUnit.SECONDS.toMillis(10));
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                restart();
-                cancel();
+                minuteTask();
             }
         }.runTaskLater(Main.getPlugin(),TimeUnit.MILLISECONDS.toSeconds(getTimeTilRestart())*20);
+        Log.log(MiniMessage.miniMessage().deserialize("<gray>Scheduled server restart in <time>",
+                Placeholder.unparsed("time",String.format("%dh:%dmin:%ds",
+                TimeUnit.MILLISECONDS.toHours(getTimeTilRestart()),
+                TimeUnit.MILLISECONDS.toMinutes(getTimeTilRestart())%60,
+                TimeUnit.MILLISECONDS.toSeconds(getTimeTilRestart()) % 60))));
+    }
+    private static void minuteTask(){
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Bukkit.broadcast(MiniMessage.miniMessage().deserialize("<red>Restarting Server!"));
+                restart();
+            }
+        }.runTaskLater(Main.getPlugin(),20*60);
     }
 }
