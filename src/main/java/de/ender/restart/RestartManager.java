@@ -34,8 +34,8 @@ public class RestartManager {
         FileConfiguration config = cconfig.getCustomConfig();
 
         String sTime = config.getString("time");
-        int sHours = Integer.getInteger(sTime.substring(0,sTime.indexOf(":")));
-        int sMinutes = Integer.getInteger(sTime.substring(sTime.indexOf(":")+1));
+        int sHours = Integer.parseInt(sTime.substring(0,sTime.indexOf(":")));
+        int sMinutes = Integer.parseInt(sTime.substring(sTime.indexOf(":")+1));
         return LocalTime.of(sHours,sMinutes,0);
     }
     public static long getTimeTilRestart(){
