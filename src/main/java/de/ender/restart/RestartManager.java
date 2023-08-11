@@ -9,10 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -32,14 +29,14 @@ public class RestartManager {
             }
         }.runTaskLater(Main.getPlugin(),20);
     }
-    public static long getRestartTime(){
+    public static LocalTime getRestartTime(){
         CConfig cconfig = new CConfig("config",Main.getPlugin());
         FileConfiguration config = cconfig.getCustomConfig();
 
         String sTime = config.getString("time");
-        long sHours = Long.parseLong(sTime.substring(0,sTime.indexOf(":")));
-        long sMinutes = Long.parseLong(sTime.substring(sTime.indexOf(":")+1));
-        return TimeUnit.HOURS.toMillis(sHours)+TimeUnit.MINUTES.toMillis(sMinutes);
+        int sHours = Integer.getInteger(sTime.substring(0,sTime.indexOf(":")));
+        int sMinutes = Integer.getInteger(sTime.substring(sTime.indexOf(":")+1));
+        return LocalTime.of(sHours,sMinutes,0);
     }
     public static long getTimeTilRestart(){
         CConfig cconfig = new CConfig("config",Main.getPlugin());
@@ -47,14 +44,11 @@ public class RestartManager {
 
         ZoneId z = ZoneId.of(config.getString("timeZone","Europe/Berlin"));
         ZonedDateTime now = ZonedDateTime.now( z );
-        long timeOfDay = now.toInstant().toEpochMilli()%86400000;
 
-        if(timeOfDay>=getRestartTime()){
-            LocalDate tomorrow = now.toLocalDate().plusDays(1);
-            ZonedDateTime tomorrowStart = tomorrow.atStartOfDay( z );
-            tomorrowStart = tomorrowStart.plusMinutes(TimeUnit.MILLISECONDS.toMinutes(getRestartTime()));
-            return Duration.between( now , tomorrowStart ).toMillis();
-        } else return getRestartTime() - timeOfDay;
+        Duration distance = Duration.between(now,getRestartTime());
+
+        if(distance.isNegative()) return TimeUnit.DAYS.toMillis(1) - distance.toMillis();
+        else return distance.toMillis();
     }
     public static void init(){
         CConfig cconfig = new CConfig("config",Main.getPlugin());
