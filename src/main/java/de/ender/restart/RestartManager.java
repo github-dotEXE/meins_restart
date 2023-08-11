@@ -47,7 +47,7 @@ public class RestartManager {
 
         Duration distance = Duration.between(now,getRestartTime());
 
-        if(distance.isNegative()) return TimeUnit.DAYS.toMillis(1) - distance.toMillis();
+        if(distance.isNegative()) return TimeUnit.DAYS.toMillis(1) + distance.toMillis();
         else return distance.toMillis();
     }
     public static void init(){
