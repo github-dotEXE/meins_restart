@@ -6,7 +6,7 @@
 
     <groupId>de.ender</groupId>
     <artifactId>restart</artifactId>
-    <version>1.11</version>
+    <version>1.12</version>
     <packaging>jar</packaging>
 
     <name>meins_restart</name>

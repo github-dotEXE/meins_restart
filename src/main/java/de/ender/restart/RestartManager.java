@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -46,12 +47,14 @@ public class RestartManager {
 
         ZoneId z = ZoneId.of(config.getString("timeZone","Europe/Berlin"));
         ZonedDateTime now = ZonedDateTime.now( z );
-        LocalDate tomorrow = now.toLocalDate().plusDays(1);
-        ZonedDateTime tomorrowStart = tomorrow.atStartOfDay( z );
-        tomorrowStart = tomorrowStart.plusMinutes(TimeUnit.MILLISECONDS.toMinutes(getRestartTime()));
-        return java.time.Duration
-                .between( now , tomorrowStart )
-                .toMillis();
+        long timeOfDay = now.toInstant().toEpochMilli()%86400000;
+
+        if(timeOfDay>=getRestartTime()){
+            LocalDate tomorrow = now.toLocalDate().plusDays(1);
+            ZonedDateTime tomorrowStart = tomorrow.atStartOfDay( z );
+            tomorrowStart = tomorrowStart.plusMinutes(TimeUnit.MILLISECONDS.toMinutes(getRestartTime()));
+            return Duration.between( now , tomorrowStart ).toMillis();
+        } else return getRestartTime() - timeOfDay;
     }
     public static void init(){
         CConfig cconfig = new CConfig("config",Main.getPlugin());
