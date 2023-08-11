@@ -43,7 +43,7 @@ public class RestartManager {
         FileConfiguration config = cconfig.getCustomConfig();
 
         ZoneId z = ZoneId.of(config.getString("timeZone","Europe/Berlin"));
-        ZonedDateTime now = ZonedDateTime.now( z );
+        LocalTime now = ZonedDateTime.now( z ).toLocalTime();
 
         Duration distance = Duration.between(now,getRestartTime());
 
